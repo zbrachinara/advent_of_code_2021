@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::borrow::Borrow;
 use std::fs::File;
 use std::io::Read;
@@ -16,7 +18,6 @@ where
 }
 
 fn main() {
-
     let s = read_file("data/day_2");
 
     // println!(
@@ -28,5 +29,12 @@ fn main() {
     //     day_1::solution_part2(day_1::format(&s).borrow())
     // );
 
-    println!("solution to day 2 part 1: {:?}", day_2::solution_part1(day_2::format(&s).borrow()))
+    println!(
+        "solution to day 2 part 1: {:?}",
+        day_2::solution_part1(day_2::format(&s).borrow())
+    );
+    println!(
+        "solution to day 2 part 2: {:?}",
+        day_2::solution_part2(day_2::format(&s).borrow())
+    );
 }

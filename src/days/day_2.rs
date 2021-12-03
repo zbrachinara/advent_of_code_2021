@@ -51,3 +51,27 @@ pub fn solution_part1(data: &[Instruction]) -> (u32, u32) {
 
     (position, depth)
 }
+
+pub fn solution_part2(data: &[Instruction]) -> (u32, u32) {
+    let mut position = 0;
+    let mut depth = 0;
+    let mut aim = 0;
+
+    data.iter().for_each(
+        |Instruction {
+             direction,
+             quantity,
+         }| {
+            match direction {
+                Direction::Forward => {
+                    position += quantity;
+                    depth += aim * quantity;
+                }
+                Direction::Up => aim -= quantity,
+                Direction::Down => aim += quantity,
+            }
+        },
+    );
+
+    (position, depth)
+}
