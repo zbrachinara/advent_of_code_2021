@@ -17,14 +17,16 @@ where
 
 fn main() {
 
-    let s = read_file("data/day_1");
+    let s = read_file("data/day_2");
 
-    println!(
-        "solution to day 1 part 1: {:?}",
-        day_1::solution_part1(day_1::format(&s).borrow())
-    );
-    println!(
-        "solution to day 1 part 2: {:?}",
-        day_1::solution_part2(day_1::format(&s).borrow())
-    );
+    // println!(
+    //     "solution to day 1 part 1: {:?}",
+    //     day_1::solution_part1(day_1::format(&s).borrow())
+    // );
+    // println!(
+    //     "solution to day 1 part 2: {:?}",
+    //     day_1::solution_part2(day_1::format(&s).borrow())
+    // );
+
+    println!("solution to day 2 part 1: {:?}", day_2::solution_part1(day_2::format(&s).borrow()))
 }
