@@ -2,7 +2,8 @@ use std::borrow::Borrow;
 use std::fs::File;
 use std::io::Read;
 
-mod day_1;
+mod days;
+use days::*;
 
 fn main() {
 
