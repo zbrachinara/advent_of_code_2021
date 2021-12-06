@@ -29,3 +29,69 @@ pub fn solution_part1(data: &str) -> (u16, u16) {
 
     (gamma, epsilon)
 }
+
+fn mcb(data: &[u16], bit: u8) -> u8 {
+    // returns 1 or 0
+    let half_size = data.len() / 2;
+    let bitmask = 1 << bit;
+    let ones = data
+        .iter()
+        .fold(0, |acc, num| if num & bitmask > 0 { acc + 1 } else { acc });
+
+    match ones {
+        x if x >= half_size => 1,
+        x if x < half_size => 0,
+        _ => unreachable!(),
+    }
+}
+
+fn lcb(data: &[u16], bit: u8) -> u8 {
+    let half_size = data.len() / 2;
+    let bitmask = 1 << bit;
+    let ones = data
+        .iter()
+        .fold(0, |acc, num| if num & bitmask > 0 { acc + 1 } else { acc });
+
+    match ones {
+        x if x < half_size => 1,
+        x if x >= half_size => 0,
+        _ => unreachable!(),
+    }
+}
+
+pub fn solution_part2(data: &str) -> (u16, u16) {
+    let data = format(data);
+
+    // calculate oxygen level
+    let oxygen = {
+        let mut data = Vec::from(data.clone());
+        let mut bit = 12;
+        while data.len() > 1 {
+            bit -= 1;
+            let mcb = u16::from(mcb(data.as_slice(), bit));
+            data.retain(|byte| {
+                (byte & (1 << bit)) == mcb << bit
+            });
+            println!("{:?}", data);
+        }
+
+        data[0]
+    };
+
+    let co2 = {
+        let mut data = Vec::from(data.clone());
+        let mut bit = 12;
+        while data.len() > 1 {
+            bit -= 1;
+            let lcb = u16::from(lcb(data.as_slice(), bit));
+            data.retain(|byte| {
+                (byte & (1 << bit)) == lcb << bit
+            });
+            println!("{:?}", data);
+        }
+
+        data[0]
+    };
+
+    (oxygen, co2)
+}
