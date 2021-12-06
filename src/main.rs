@@ -38,6 +38,5 @@ fn main() {
     //     day_2::solution_part2(day_2::format(&s).borrow())
     // );
 
-    println!("solution to day 3 part 1: {:?}", day_3::solution_part1(&s));
-    println!("solution to day 3 part 2: {:?}", day_3::solution_part2(&s));
+    day_4::solution_part1(&mut File::open("data/day_4").unwrap());
 }
