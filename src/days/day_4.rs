@@ -14,11 +14,6 @@ struct Board {
     data: Array2D<u32>,
 }
 
-enum Wins {
-    Row(usize),
-    Col(usize),
-}
-
 fn find_on<T>(arr: &Array2D<T>, elem: T) -> Vec<(usize, usize)>
 where
     T: PartialEq<T> + Clone,
@@ -35,7 +30,9 @@ impl Board {
         assert_eq!(set.num_columns(), self.data.num_columns());
         assert_eq!(set.num_rows(), self.data.num_rows());
 
-        for mut row in set.columns_iter() {
+        println!("checking array {:?}", self.data);
+
+        for mut row in set.rows_iter() {
             if row.all(|x| *x) {
                 return true;
             }
@@ -52,9 +49,12 @@ impl Board {
 
     fn score(&self, set: &Array2D<bool>) -> u32 {
         println!("{:?}, {:?}", self.data, set);
-        self.data.elements_row_major_iter().enumerate().filter(|(i, _)| {
-            !set[(i % self.data.num_columns(), i / self.data.num_rows())]
-        }).map(|(_, x)| x).sum()
+        self.data
+            .elements_row_major_iter()
+            .enumerate()
+            .filter(|(i, _)| !set[(i % self.data.num_columns(), i / self.data.num_rows())])
+            .map(|(_, x)| x)
+            .sum()
     }
 }
 
@@ -94,7 +94,6 @@ impl Game {
     }
 
     fn winning_score(&self) -> Option<(u32, u32)> {
-        let move_size = self.boards.len();
         let mut board_data = self
             .boards
             .iter()
@@ -110,9 +109,37 @@ impl Game {
 
             for (board, marks) in board_data.iter() {
                 if board.wins(&marks) {
-                    return Some((board.score(&marks), *called))
+                    return Some((board.score(&marks), *called));
                 }
             }
+        }
+
+        None
+    }
+
+    fn losing_score(&self) -> Option<(u32, u32)> {
+        let mut board_data = self
+            .boards
+            .iter()
+            .map(|board| (board, Array2D::filled_with(false, 5, 5)))
+            .collect::<Vec<_>>();
+
+        for called in &self.moves {
+            board_data.iter_mut().for_each(|(board, ref mut flags)| {
+                find_on(&board.data, *called).iter().for_each(|index| {
+                    flags[*index] = true;
+                });
+            });
+
+            if board_data.len() != 1 {
+                board_data.retain(|(board, marks)| !board.wins(&marks));
+            } else {
+                let (board, marks) = &board_data[0];
+                if board.wins(marks) {
+                    return Some((board.score(marks), *called));
+                }
+            }
+
         }
 
         None
@@ -122,4 +149,9 @@ impl Game {
 pub fn solution_part1(file: &mut File) -> (u32, u32) {
     let game = Game::new(&mut BufReader::new(file));
     game.winning_score().unwrap()
+}
+
+pub fn solution_part2(file: &mut File) -> (u32, u32) {
+    let game = Game::new(&mut BufReader::new(file));
+    game.losing_score().unwrap()
 }
