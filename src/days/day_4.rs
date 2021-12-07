@@ -14,6 +14,11 @@ struct Board {
     data: Array2D<u32>,
 }
 
+enum Wins {
+    Row(usize),
+    Col(usize),
+}
+
 fn find_on<T>(arr: &Array2D<T>, elem: T) -> Vec<(usize, usize)>
 where
     T: PartialEq<T> + Clone,
@@ -23,6 +28,34 @@ where
         .filter(|(_, x)| **x == elem)
         .map(|(i, _)| (i % arr.num_columns(), i / arr.num_columns()))
         .collect::<Vec<_>>()
+}
+
+impl Board {
+    fn wins(&self, set: &Array2D<bool>) -> bool {
+        assert_eq!(set.num_columns(), self.data.num_columns());
+        assert_eq!(set.num_rows(), self.data.num_rows());
+
+        for mut row in set.columns_iter() {
+            if row.all(|x| *x) {
+                return true;
+            }
+        }
+
+        for mut col in set.columns_iter() {
+            if col.all(|x| *x) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    fn score(&self, set: &Array2D<bool>) -> u32 {
+        println!("{:?}, {:?}", self.data, set);
+        self.data.elements_row_major_iter().enumerate().filter(|(i, _)| {
+            !set[(i % self.data.num_columns(), i / self.data.num_rows())]
+        }).map(|(_, x)| x).sum()
+    }
 }
 
 impl Game {
@@ -60,7 +93,7 @@ impl Game {
         }
     }
 
-    fn winning_score(&self) -> Option<usize> {
+    fn winning_score(&self) -> Option<(u32, u32)> {
         let move_size = self.boards.len();
         let mut board_data = self
             .boards
@@ -74,16 +107,19 @@ impl Game {
                     flags[*index] = true;
                 });
             });
+
+            for (board, marks) in board_data.iter() {
+                if board.wins(&marks) {
+                    return Some((board.score(&marks), *called))
+                }
+            }
         }
 
         None
     }
 }
 
-pub fn solution_part1(file: &mut File) {
+pub fn solution_part1(file: &mut File) -> (u32, u32) {
     let game = Game::new(&mut BufReader::new(file));
-    game.winning_score();
-
-    println!("{:?}", find_on(&game.boards[0].data, 63));
-    todo!()
+    game.winning_score().unwrap()
 }
