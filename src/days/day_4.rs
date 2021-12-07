@@ -139,7 +139,6 @@ impl Game {
                     return Some((board.score(marks), *called));
                 }
             }
-
         }
 
         None
