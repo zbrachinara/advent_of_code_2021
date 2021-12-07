@@ -43,6 +43,6 @@ fn main() {
 
     // println!("solution to day 5 part 1: {:?}", day_5::solution_part1(&mut File::open("data/day_5").unwrap()));
     // println!("solution to day 5 part 2: {:?}", day_5::solution_part2(&mut File::open("data/day_5").unwrap()));
-    println!("solution to day 6 part 1: {:?}", day_6::solution_part1(&mut File::open("data/day_6").unwrap()));
-    println!("solution to day 6 part 2: {:?}", day_6::solution_part2(&mut File::open("data/day_6").unwrap()));
+    // println!("solution to day 6 part 1: {:?}", day_6::solution_part1(&mut File::open("data/day_6").unwrap()));
+    // println!("solution to day 6 part 2: {:?}", day_6::solution_part2(&mut File::open("data/day_6").unwrap()));
 }
