@@ -33,6 +33,19 @@ fn format(r: &mut impl Read) -> BTreeMap<Point, Point> {
         .collect::<BTreeMap<_, _>>()
 }
 
+impl Point {
+    fn on_line(&self, line: &(&Point, &Point)) -> bool {
+        let (Point(a, b), Point(c, d)) = line;
+        let Point(x, y) = self;
+
+        if a == c || b == d {
+            between(*x, *a, *c) && between(*y, *b, *d)
+        } else {
+            between(*x, *a, *c) && between(*y, *b, *d) && ((x - a).abs() == (y - b).abs())
+        }
+    }
+}
+
 pub fn solution_part1(f: &mut File) -> u32 {
     let map = format(f);
 
@@ -40,7 +53,6 @@ pub fn solution_part1(f: &mut File) -> u32 {
     let map = map
         .into_iter()
         .filter(|(Point(a, b), Point(c, d))| a == c || b == d)
-        .inspect(|points| println!("{:?}", points))
         .collect::<BTreeMap<_, _>>();
 
     let mut count = 0;
@@ -51,7 +63,26 @@ pub fn solution_part1(f: &mut File) -> u32 {
                 .filter(|(Point(a, b), Point(c, d))| between(x, *a, *c) && between(y, *b, *d))
                 .nth(1)
             {
-                // println!("{:?}", points);
+                count += 1;
+            }
+        })
+    });
+
+    count
+}
+
+pub fn solution_part2(f: &mut File) -> u32 {
+    let map = format(f);
+
+    let mut count = 0;
+    (0..MAX).for_each(|x| {
+        (0..MAX).for_each(|y| {
+            let p = Point(x, y);
+            if let Some(points) = map
+                .iter()
+                .filter(|line| p.on_line(line))
+                .nth(1)
+            {
                 count += 1;
             }
         })
