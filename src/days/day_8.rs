@@ -1,3 +1,4 @@
+use std::fmt::{Debug, Formatter};
 use bitvec::prelude::*;
 use derive_more::Deref;
 use itertools::Itertools;
@@ -38,7 +39,7 @@ impl Into<u8> for Segment {
     }
 }
 
-#[derive(Deref, Debug)]
+#[derive(Deref)]
 struct Signal(BitVec);
 
 impl From<&str> for Signal {
@@ -48,6 +49,12 @@ impl From<&str> for Signal {
             segments[Into::<u8>::into(seg) as usize] = true;
         });
         Self(segments.iter().collect())
+    }
+}
+
+impl Debug for Signal {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:b}", self.0.as_raw_slice()[0])
     }
 }
 
