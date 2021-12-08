@@ -2,7 +2,7 @@ use bitvec::prelude::*;
 use std::fs::File;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct BitArray {
     data: Vec<BitVec>,
 }
@@ -63,10 +63,34 @@ pub fn solution_part1(mut f: File) -> (u16, u16) {
             let ones = it.filter(|x| *x).fold(0, |acc, _| acc + 1);
             ones >= half_len
         })
-        // .inspect(|b| if *b { print!("1") } else { print!("0") })
         .enumerate()
         .fold(0, |acc, (i, b)| acc + (if b { 1 } else { 0 } << i));
     let epsilon = !gamma & u16::pow(2, 12) - 1;
 
     (gamma, epsilon)
+}
+
+pub fn solution_part2(mut f: File) -> (u16, u16) {
+    let data = format(&mut f);
+    let (mut oxy, mut co2) = (data.clone(), data.clone());
+
+    (0..12).for_each(|i| {
+        // count bits in columns
+        let half_len = data.num_rows() / 2;
+        let ones = data.columns().nth(i).unwrap().filter(|x| *x).fold(0, |acc, _| acc + 1);
+        println!("amount of \"one\" bits found: {}", ones);
+
+        // act on those bits
+        if ones <= half_len {
+            oxy.data.retain(|vec| vec[i]);
+            co2.data.retain(|vec| !vec[i]);
+        } else {
+            oxy.data.retain(|vec| !vec[i]);
+            co2.data.retain(|vec| vec[i]);
+        }
+
+        println!("step {}: {:?} with length {}", i, oxy.data, oxy.data.len());
+
+    });
+    todo!()
 }
