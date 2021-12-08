@@ -7,5 +7,7 @@ edition = "2021"
 
 [dependencies]
 itermore = "0.1.0"
+itertools = "0.10.3"
 array2d = "0.2.1"
 bitvec = "0.22.3"
+derive_more = "0.99.17"
