@@ -1,7 +1,7 @@
-use std::fmt::{Debug, Formatter};
 use bitvec::prelude::*;
 use derive_more::Deref;
 use itertools::Itertools;
+use std::fmt::{Debug, Formatter};
 use std::fs::File;
 use std::io::Read;
 use std::mem::{transmute, MaybeUninit};
@@ -58,6 +58,15 @@ impl Debug for Signal {
     }
 }
 
+impl Signal {
+    fn segment(&self, segment: Segment) -> bool {
+        (*self)[Into::<u8>::into(segment) as usize]
+    }
+    fn size(&self) -> usize {
+        (*self).iter().filter(|x| **x).fold(0, |acc, _| acc + 1)
+    }
+}
+
 fn collect_signals(s: &str, signal_slice: &mut [MaybeUninit<Signal>]) {
     s.split_whitespace()
         .map(Signal::from)
@@ -89,7 +98,17 @@ fn format(f: &mut impl Read) -> Vec<([Signal; 10], [Signal; 4])> {
     .collect::<Vec<_>>()
 }
 
-pub fn solution_part1(mut f: File) {
+pub fn solution_part1(mut f: File) -> u32 {
     let data = format(&mut f);
     println!("{:?}", data);
+
+    data.iter()
+        .map(|(_, x)| x.iter())
+        .flatten()
+        .filter(|signal| {
+            let len = signal.size();
+            len == 2 || len == 3 || len == 4 || len == 7
+        })
+        .inspect(|x| println!("{:?}", x))
+        .fold(0, |acc, _| acc + 1)
 }
