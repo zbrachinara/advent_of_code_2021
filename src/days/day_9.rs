@@ -22,8 +22,7 @@ fn format(data: &mut impl Read) -> Array2D<u8> {
     Array2D::from_rows(data.as_slice())
 }
 
-fn get_near(arr: &Array2D<u8>, (x, y): (usize, usize)) -> Box<[u8]> {
-    let mut it: Box<dyn Iterator<Item = _>> = {
+fn kern((x, y): (usize, usize)) -> Box<dyn Iterator<Item = (usize, usize)>> {
         let it = [(x + 1, y), (x, y + 1)].into_iter();
         if x > 0 && y > 0 {
             Box::new(chain(it, [(x - 1, y), (x, y - 1)]))
@@ -34,7 +33,10 @@ fn get_near(arr: &Array2D<u8>, (x, y): (usize, usize)) -> Box<[u8]> {
         } else {
             Box::new(it)
         }
-    };
+}
+
+fn get_near(arr: &Array2D<u8>, (x, y): (usize, usize)) -> Box<[u8]> {
+    let it = kern((x, y));
 
     it.map(|(x, y)| arr.get(x, y))
         .filter_map(|x| x)
@@ -42,6 +44,12 @@ fn get_near(arr: &Array2D<u8>, (x, y): (usize, usize)) -> Box<[u8]> {
         .collect::<Vec<_>>()
         .into_boxed_slice()
 }
+//
+// fn find_near(arr: &mut Array2D<u8>, pos: (usize, usize)) -> u32 {
+//     if arr[pos] == 9 { return 0} else {
+//
+//     }
+// }
 
 pub fn solution_part1(mut data: File) -> u32 {
     let data = format(&mut data);
@@ -50,6 +58,26 @@ pub fn solution_part1(mut data: File) -> u32 {
         .cartesian_product(0..100)
         .map(|pos| (data[pos], get_near(&data, pos)))
         .filter(|(height, near)| near.iter().all(|x| height < x))
-        .map(|(x, _)| (x+1) as u32)
+        .map(|(x, _)| (x + 1) as u32)
         .sum()
+}
+
+pub fn solution_part2(mut data: File) -> u32 {
+    let data = format(&mut data);
+
+    // let low_points = (0..100)
+    //     .cartesian_product(0..100)
+    //     .map(|pos| (pos, data[pos], get_near(&data, pos)))
+    //     .filter(|(_, height, near)| near.iter().all(|x| height < x))
+    //     .map(|(pos, _, _)| pos);
+
+    // let sizes = vec![];
+
+    (0..100).cartesian_product(0..100).for_each(|pos| {
+        if !data[pos] == 9 {
+
+        }
+    });
+
+    todo!()
 }
