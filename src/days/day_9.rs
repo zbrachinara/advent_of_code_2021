@@ -23,16 +23,16 @@ fn format(data: &mut impl Read) -> Array2D<u8> {
 }
 
 fn kern((x, y): (usize, usize)) -> Box<dyn Iterator<Item = (usize, usize)>> {
-        let it = [(x + 1, y), (x, y + 1)].into_iter();
-        if x > 0 && y > 0 {
-            Box::new(chain(it, [(x - 1, y), (x, y - 1)]))
-        } else if x > 0 {
-            Box::new(chain(it, once((x - 1, y))))
-        } else if y > 0 {
-            Box::new(chain(it, once((x, y - 1))))
-        } else {
-            Box::new(it)
-        }
+    let it = [(x + 1, y), (x, y + 1)].into_iter();
+    if x > 0 && y > 0 {
+        Box::new(chain(it, [(x - 1, y), (x, y - 1)]))
+    } else if x > 0 {
+        Box::new(chain(it, once((x - 1, y))))
+    } else if y > 0 {
+        Box::new(chain(it, once((x, y - 1))))
+    } else {
+        Box::new(it)
+    }
 }
 
 fn get_near(arr: &Array2D<u8>, (x, y): (usize, usize)) -> Box<[u8]> {
@@ -44,12 +44,21 @@ fn get_near(arr: &Array2D<u8>, (x, y): (usize, usize)) -> Box<[u8]> {
         .collect::<Vec<_>>()
         .into_boxed_slice()
 }
-//
-// fn find_near(arr: &mut Array2D<u8>, pos: (usize, usize)) -> u32 {
-//     if arr[pos] == 9 { return 0} else {
-//
-//     }
-// }
+
+fn find_near(arr: &mut Array2D<u8>, pos: (usize, usize)) -> u32 {
+    if let Some(val) = arr.get(pos.0, pos.1).cloned() {
+        if val == 9 {
+            0
+        } else {
+            arr[pos] = 9;
+            kern(pos).map(|pos| find_near(arr, pos)).sum::<u32>() + 1
+        }
+    } else {
+        0
+    }
+
+    // todo!()
+}
 
 pub fn solution_part1(mut data: File) -> u32 {
     let data = format(&mut data);
@@ -62,22 +71,17 @@ pub fn solution_part1(mut data: File) -> u32 {
         .sum()
 }
 
-pub fn solution_part2(mut data: File) -> u32 {
-    let data = format(&mut data);
+pub fn solution_part2(mut data: File) -> (u32, u32, u32) {
+    let mut data = format(&mut data);
 
-    // let low_points = (0..100)
-    //     .cartesian_product(0..100)
-    //     .map(|pos| (pos, data[pos], get_near(&data, pos)))
-    //     .filter(|(_, height, near)| near.iter().all(|x| height < x))
-    //     .map(|(pos, _, _)| pos);
+    let mut sizes = (0..100)
+        .cartesian_product(0..100)
+        .map(|pos| find_near(&mut data, pos))
+        .filter(|x| *x != 0)
+        .collect::<Vec<_>>();
 
-    // let sizes = vec![];
+    sizes.sort_unstable();
+    let mut sizes_it = sizes.into_iter();
 
-    (0..100).cartesian_product(0..100).for_each(|pos| {
-        if !data[pos] == 9 {
-
-        }
-    });
-
-    todo!()
+    (sizes_it.next_back().unwrap(), sizes_it.next_back().unwrap(), sizes_it.next_back().unwrap())
 }
