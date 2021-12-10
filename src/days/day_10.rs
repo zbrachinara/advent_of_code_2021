@@ -52,13 +52,13 @@ pub fn solution_part1(mut data: File) -> u64{
 
     data.iter()
         .filter_map(|row| {
-            let mut items = LinkedList::new();
+            let mut items = Vec::with_capacity(row.len());
 
             for item in row.iter() {
                 if let Bracket::Open(opening) = item {
-                    items.push_back(opening);
+                    items.push(opening);
                 } else if let Bracket::Close(closing) = item {
-                    let opening = items.pop_back();
+                    let opening = items.pop();
                     if opening != Some(closing) && opening != None {
                         return Some(closing);
                     }
