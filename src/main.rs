@@ -55,4 +55,5 @@ fn main() {
     // println!("solution to day 9 part 2: {:?}", day_9::solution_part2(File::open("data/day_9").unwrap()));
 
     println!("solution to day 10 part 1: {:?}", day_10::solution_part1(File::open("data/day_10").unwrap()));
+    println!("solution to day 10 part 2: {:?}", day_10::solution_part2(File::open("data/day_10").unwrap()));
 }

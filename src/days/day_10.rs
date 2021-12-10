@@ -1,4 +1,3 @@
-use std::collections::LinkedList;
 use std::fs::File;
 use std::io::Read;
 
@@ -47,26 +46,28 @@ fn format(data: &mut impl Read) -> Vec<Vec<Bracket>> {
     .collect()
 }
 
-pub fn solution_part1(mut data: File) -> u64{
+fn find_corrupted(row: &Vec<Bracket>) -> Option<&BracketType> {
+    let mut items = Vec::with_capacity(row.len());
+
+    for item in row.iter() {
+        if let Bracket::Open(opening) = item {
+            items.push(opening);
+        } else if let Bracket::Close(closing) = item {
+            let opening = items.pop();
+            if opening != Some(closing) && opening != None {
+                return Some(&closing);
+            }
+        }
+    }
+
+    None
+}
+
+pub fn solution_part1(mut data: File) -> u64 {
     let data = format(&mut data);
 
     data.iter()
-        .filter_map(|row| {
-            let mut items = Vec::with_capacity(row.len());
-
-            for item in row.iter() {
-                if let Bracket::Open(opening) = item {
-                    items.push(opening);
-                } else if let Bracket::Close(closing) = item {
-                    let opening = items.pop();
-                    if opening != Some(closing) && opening != None {
-                        return Some(closing);
-                    }
-                }
-            }
-
-            None
-        })
+        .filter_map(find_corrupted)
         .map(|delim| match delim {
             BracketType::BRACE => 1197,
             BracketType::ROUND => 3,
@@ -74,4 +75,27 @@ pub fn solution_part1(mut data: File) -> u64{
             BracketType::ANGLE => 25137,
         })
         .sum()
+}
+
+pub fn solution_part2(mut data: File) -> u64 {
+    format(&mut data)
+        .iter()
+        .filter(|row| matches!(find_corrupted(row), None))
+        .map(|row| {
+            let mut items = Vec::with_capacity(row.len());
+
+            row.iter().for_each(|item| match item {
+                Bracket::Open(i) => items.push(i),
+                Bracket::Close(_) => {
+                    items.pop();
+                }
+            });
+
+            items
+        })
+        .for_each(|data| {
+            println!("{:?}", data);
+        });
+
+    todo!()
 }
