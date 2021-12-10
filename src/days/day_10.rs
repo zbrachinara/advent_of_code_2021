@@ -78,9 +78,10 @@ pub fn solution_part1(mut data: File) -> u64 {
 }
 
 pub fn solution_part2(mut data: File) -> u64 {
-    format(&mut data)
+    let mut scores = format(&mut data)
         .iter()
         .filter(|row| matches!(find_corrupted(row), None))
+        // find symbols required to autocomplete
         .map(|row| {
             let mut items = Vec::with_capacity(row.len());
 
@@ -93,9 +94,23 @@ pub fn solution_part2(mut data: File) -> u64 {
 
             items
         })
-        .for_each(|data| {
-            println!("{:?}", data);
-        });
+        .inspect(|s| println!("{:?}", s))
+        // find score of autocompletion
+        .map(|completion| {
+            completion.iter().rev().fold(0u64, |acc, item| {
+                dbg!(acc, item);
+                acc * 5 + match item {
+                    BracketType::BRACE => 3,
+                    BracketType::ROUND => 1,
+                    BracketType::SQUARE => 2,
+                    BracketType::ANGLE => 4,
+                }
+            })
+        })
+        .collect::<Vec<_>>();
 
-    todo!()
+    let median_position = scores.len() / 2;
+    let (_, out, _) = scores.as_mut_slice().select_nth_unstable(median_position);
+
+    *out
 }
