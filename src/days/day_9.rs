@@ -80,8 +80,6 @@ pub fn solution_part2(mut data: File) -> (u32, u32, u32) {
         .filter(|x| *x != 0)
         .collect::<Vec<_>>();
 
-    sizes.sort_unstable();
-    let mut sizes_it = sizes.into_iter();
-
-    (sizes_it.next_back().unwrap(), sizes_it.next_back().unwrap(), sizes_it.next_back().unwrap())
+    sizes.sort_unstable_by(|a, b| a.cmp(b).reverse());
+    (sizes[0], sizes[1], sizes[2])
 }
