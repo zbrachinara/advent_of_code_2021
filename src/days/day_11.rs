@@ -1,3 +1,4 @@
+use std::fmt::{Debug, Formatter};
 use derive_more::{Deref, DerefMut};
 use std::fs::File;
 use std::io::Read;
@@ -33,6 +34,10 @@ impl<T> Vec2D<T> {
 
     pub fn iter_mut_row_major(&mut self) -> impl Iterator<Item = &mut T> {
         self.data.iter_mut()
+    }
+
+    pub fn iter_rows(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
+        (0..self.rows).map(|i| (i..(i + self.cols)).map(|i| &self.data[i]))
     }
 
     fn flatten_coords(&self, (x, y): (usize, usize)) -> Option<usize> {
@@ -74,8 +79,22 @@ impl<T> IndexMut<(usize, usize)> for Vec2D<T> {
     }
 }
 
-#[derive(Deref, DerefMut, Debug)]
+#[derive(Deref, DerefMut)]
 struct State(Vec2D<u8>);
+
+impl Debug for State {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+
+        for row in self.iter_rows() {
+            for num in row {
+                write!(f, "{} ", num)?
+            }
+            writeln!(f)?
+        }
+
+        Ok(())
+    }
+}
 
 impl State {
     fn increase_light(&mut self) {
@@ -103,7 +122,11 @@ fn format(data: &mut dyn Read) -> State {
 pub fn solution_part1(mut f: File) -> u32 {
     let mut state = format(&mut f);
 
+    println!("{:?}", state);
     state.increase_light();
+    println!("{:?}", state);
+
+
 
     todo!()
 }
