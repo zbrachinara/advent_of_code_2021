@@ -1,7 +1,7 @@
+use derive_more::{Deref, DerefMut};
 use std::fs::File;
 use std::io::Read;
 use std::ops::{Index, IndexMut};
-use derive_more::{Deref, DerefMut};
 // use array2d::Array2D;
 use itertools::Itertools;
 
@@ -12,7 +12,7 @@ struct Vec2D<T> {
     cols: usize,
 }
 
-impl <T> Vec2D<T> {
+impl<T> Vec2D<T> {
     pub fn from_rows(data: Vec<Vec<T>>) -> Self {
         assert_ne!(data.len(), 0);
         assert_ne!(data[0].len(), 0);
@@ -21,11 +21,14 @@ impl <T> Vec2D<T> {
         let cols = data[0].len();
 
         Vec2D {
-            data: data.into_iter().map(|vec| vec.into_iter()).flatten().collect_vec(),
+            data: data
+                .into_iter()
+                .map(|vec| vec.into_iter())
+                .flatten()
+                .collect_vec(),
             rows,
             cols,
         }
-
     }
 
     pub fn iter_mut_row_major(&mut self) -> impl Iterator<Item = &mut T> {
@@ -57,7 +60,7 @@ impl <T> Vec2D<T> {
     }
 }
 
-impl <T> Index<(usize, usize)> for Vec2D<T> {
+impl<T> Index<(usize, usize)> for Vec2D<T> {
     type Output = T;
 
     fn index(&self, index: (usize, usize)) -> &Self::Output {
@@ -65,7 +68,7 @@ impl <T> Index<(usize, usize)> for Vec2D<T> {
     }
 }
 
-impl <T> IndexMut<(usize, usize)> for Vec2D<T> {
+impl<T> IndexMut<(usize, usize)> for Vec2D<T> {
     fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
         self.get_mut(index).unwrap()
     }
@@ -75,11 +78,9 @@ impl <T> IndexMut<(usize, usize)> for Vec2D<T> {
 struct State(Vec2D<u8>);
 
 impl State {
-
-   fn increase_light(&mut self) {
+    fn increase_light(&mut self) {
         self.iter_mut_row_major().for_each(|squid| *squid += 1);
-   }
-
+    }
 }
 
 fn format(data: &mut dyn Read) -> State {
@@ -87,8 +88,14 @@ fn format(data: &mut dyn Read) -> State {
         let mut s = String::new();
         data.read_to_string(&mut s).unwrap();
         s
-    }.split_whitespace()
-        .map(|s| s.chars().map(|c| u8::from_str_radix(&String::from(c), 10).unwrap()).collect_vec()).collect_vec();
+    }
+    .split_whitespace()
+    .map(|s| {
+        s.chars()
+            .map(|c| u8::from_str_radix(&String::from(c), 10).unwrap())
+            .collect_vec()
+    })
+    .collect_vec();
 
     State(Vec2D::from_rows(arr))
 }
