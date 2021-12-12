@@ -98,7 +98,6 @@ pub fn solution_part2(mut data: File) -> u64 {
         // find score of autocompletion
         .map(|completion| {
             completion.iter().rev().fold(0u64, |acc, item| {
-                dbg!(acc, item);
                 acc * 5 + match item {
                     BracketType::BRACE => 3,
                     BracketType::ROUND => 1,
