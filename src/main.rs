@@ -5,6 +5,8 @@ use std::io::Read;
 use std::path::Path;
 
 mod days;
+mod vec2d;
+
 use days::*;
 
 fn read_file<P>(path: P) -> String

@@ -1,90 +1,19 @@
-use std::fmt::{Debug, Formatter};
 use derive_more::{Deref, DerefMut};
+use std::cell::RefMut;
+use std::fmt::{Debug, Formatter};
 use std::fs::File;
 use std::io::Read;
 use std::ops::{Index, IndexMut};
-// use array2d::Array2D;
+use std::rc::Rc;
+use crate::vec2d::Vec2D;
 use itertools::Itertools;
 
-#[derive(Debug)]
-struct Vec2D<T> {
-    data: Vec<T>,
-    rows: usize,
-    cols: usize,
-}
-
-impl<T> Vec2D<T> {
-    pub fn from_rows(data: Vec<Vec<T>>) -> Self {
-        assert_ne!(data.len(), 0);
-        assert_ne!(data[0].len(), 0);
-
-        let rows = data.len();
-        let cols = data[0].len();
-
-        Vec2D {
-            data: data
-                .into_iter()
-                .map(|vec| vec.into_iter())
-                .flatten()
-                .collect_vec(),
-            rows,
-            cols,
-        }
-    }
-
-    pub fn iter_mut_row_major(&mut self) -> impl Iterator<Item = &mut T> {
-        self.data.iter_mut()
-    }
-
-    pub fn iter_rows(&self) -> impl Iterator<Item = impl Iterator<Item = &T>> {
-        (0..self.rows).map(|i| (i..(i + self.cols)).map(|i| &self.data[i]))
-    }
-
-    fn flatten_coords(&self, (x, y): (usize, usize)) -> Option<usize> {
-        if x < self.rows && y < self.cols {
-            Some(y * self.cols + x)
-        } else {
-            None
-        }
-    }
-
-    pub fn get(&self, index: (usize, usize)) -> Option<&T> {
-        if let Some(index) = self.flatten_coords(index) {
-            Some(&self.data[index])
-        } else {
-            None
-        }
-    }
-
-    pub fn get_mut(&mut self, index: (usize, usize)) -> Option<&mut T> {
-        if let Some(index) = self.flatten_coords(index) {
-            Some(&mut self.data[index])
-        } else {
-            None
-        }
-    }
-}
-
-impl<T> Index<(usize, usize)> for Vec2D<T> {
-    type Output = T;
-
-    fn index(&self, index: (usize, usize)) -> &Self::Output {
-        self.get(index).unwrap()
-    }
-}
-
-impl<T> IndexMut<(usize, usize)> for Vec2D<T> {
-    fn index_mut(&mut self, index: (usize, usize)) -> &mut Self::Output {
-        self.get_mut(index).unwrap()
-    }
-}
 
 #[derive(Deref, DerefMut)]
 struct State(Vec2D<u8>);
 
 impl Debug for State {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-
         for row in self.iter_rows() {
             for num in row {
                 write!(f, "{} ", num)?
@@ -100,6 +29,8 @@ impl State {
     fn increase_light(&mut self) {
         self.iter_mut_row_major().for_each(|squid| *squid += 1);
     }
+
+    fn single_flash(&mut self) {}
 }
 
 fn format(data: &mut dyn Read) -> State {
@@ -125,8 +56,6 @@ pub fn solution_part1(mut f: File) -> u32 {
     println!("{:?}", state);
     state.increase_light();
     println!("{:?}", state);
-
-
 
     todo!()
 }
